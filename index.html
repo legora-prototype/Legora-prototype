@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legora - Legal Tech Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6D28D9',
+                        dark: '#000000',
+                        light: '#FFFFFF',
+                        gray: {
+                            100: '#F3F4F6',
+                            200: '#E5E7EB',
+                            300: '#D1D5DB',
+                            400: '#9CA3AF',
+                            500: '#6B7280',
+                            600: '#4B5563',
+                            700: '#374151',
+                            800: '#1F2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+        .page.active {
+            display: block;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #6D28D9;
+        }
+        
+        /* Mobile Menu Styles */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .mobile-menu.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .mobile-menu-link {
+            padding: 15px 20px;
+            border-bottom: 1px solid #374151;
+            font-size: 18px;
+            color: #D1D5DB;
+        }
+        .mobile-menu-link:hover {
+            background-color: #1F2937;
+            color: #fff;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: #fff;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            .desktop-nav {
+                display: none !important;
+            }
+            /* Reduce padding on mobile */
+            .max-w-7xl {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            /* Adjust font sizes */
+            h1 {
+                font-size: 1.875rem !important;
+            }
+            h2 {
+                font-size: 1.5rem !important;
+            }
+            /* Fix navigation spacing */
+            nav {
+                padding: 1rem !important;
+            }
+            /* Make cards full width on mobile */
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            /* Adjust mode tabs for mobile */
+            .mode-tab {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+        
+        .badge {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #1F2937;
+            color: white;
+            font-size: 24px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(109, 40, 217, 0.5);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(109, 40, 217, 0.4);
+        }
+        .feedback-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            max-width: 500px;
+            width: 90%;
+            display: none;
+        }
+        .feedback-popup.show {
+            display: block;
+            animation: popIn 0.3s ease-out forwards;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            display: none;
+        }
+        .overlay.show {
+            display: block;
+        }
+        .mode-tab {
+            padding: 12px 24px;
+            border: 2px solid #374151;
+            background: transparent;
+            color: #9CA3AF;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .mode-tab:hover {
+            border-color: #6D28D9;
+            color: #fff;
+        }
+        .mode-tab.active {
+            background: #6D28D9;
+            border-color: #6D28D9;
+            color: #fff;
+        }
+        .mini-ai-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1F2937;
+            border: 2px solid #6D28D9;
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 10px 40px rgba(109, 40, 217, 0.3);
+            display: none;
+            z-index: 30;
+        }
+        .mini-ai-widget.show {
+            display: block;
+            animation: slideInRight 0.3s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-inter">
+    <!-- Login & Registration Page -->
+    <div id="login-page" class="page active fade-in">
+        <div class="min-h-screen flex items-center justify-center px-4">
+            <div class="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-xl shadow-lg">
+                <div class="text-center">
+                    <h1 class="text-3xl font-semibold text-primary mb-2">Legora</h1>
+                    <p class="text-gray-400">Your legal simulation and networking platform</p>
+                </div>
+                <form class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm space-y-4">
+                        <div>
+                            <label for="email" class="sr-only">Email address</label>
+                            <input id="email" name="email" type="email" required class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-700 bg-gray-800 text-light placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Email address">
+                        </div>
+                        <div>
+                            <label for="password" class="sr-only">Password</label>
+                            <input id="password" name="password" type="password" required class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-700 bg-gray-800 text-light placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Password">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-700 rounded bg-gray-800">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-400">Remember me</label>
+                        </div>
+
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary hover:text-purple-400">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button type="button" id="login-btn" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Log In
+                        </button>
+                        <button type="button" id="register-btn" class="group relative w-full flex justify-center py-3 px-4 border border-gray-700 text-sm font-medium rounded-lg text-white bg-transparent hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            Register
+                        </button>
+                    </div>
+                    
+                    <!-- Skip Login for Testing -->
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        <button type="button" id="skip-login-btn" onclick="navigateTo('home-page')" class="w-full flex justify-center items-center py-3 px-4 text-sm font-medium rounded-lg text-gray-400 bg-gray-800/50 hover:bg-gray-800 hover:text-white transition-all">
+                            <span class="mr-2">🔬</span>
+                            Skip Login (Prototype Testing)
+                        </button>
+                        <p class="text-xs text-gray-500 text-center mt-2">For testing purposes only</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar (for all pages except login) -->
+    <nav id="main-nav" class="bg-gray-900 py-4 px-6 hidden">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center">
+                <h1 class="text-2xl md:text-3xl font-semibold text-primary">Legora</h1>
+            </div>
+            
+            <!-- Hamburger Menu (Mobile) -->
+            <div class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav hidden md:flex space-x-4 lg:space-x-8">
+                <a href="#" onclick="navigateTo('home-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Home</a>
+                <a href="#" onclick="navigateTo('case-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Cases</a>
+                <a href="#" onclick="navigateTo('news-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">News</a>
+                <a href="#" onclick="navigateTo('ai-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">LegoraAI</a>
+                <a href="#" onclick="navigateTo('leaderboard-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Leaderboard</a>
+                <a href="#" onclick="navigateTo('feedback-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Feedback</a>
+                <a href="#" onclick="navigateTo('profile-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Profile</a>
+                <a href="#" onclick="navigateTo('login-page')" class="nav-link text-gray-300 hover:text-white text-sm lg:text-base">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-semibold text-primary">Menu</h2>
+            <button onclick="toggleMobileMenu()" class="text-white text-3xl">&times;</button>
+        </div>
+        <a href="#" onclick="navigateTo('home-page'); toggleMobileMenu();" class="mobile-menu-link">🏠 Home</a>
+        <a href="#" onclick="navigateTo('case-page'); toggleMobileMenu();" class="mobile-menu-link">⚖️ Cases</a>
+        <a href="#" onclick="navigateTo('news-page'); toggleMobileMenu();" class="mobile-menu-link">📰 News & Articles</a>
+        <a href="#" onclick="navigateTo('ai-page'); toggleMobileMenu();" class="mobile-menu-link">🤖 LegoraAI</a>
+        <a href="#" onclick="navigateTo('leaderboard-page'); toggleMobileMenu();" class="mobile-menu-link">🏆 Leaderboard</a>
+        <a href="#" onclick="navigateTo('feedback-page'); toggleMobileMenu();" class="mobile-menu-link">💬 Feedback</a>
+        <a href="#" onclick="navigateTo('profile-page'); toggleMobileMenu();" class="mobile-menu-link">👤 Profile</a>
+        <a href="#" onclick="navigateTo('login-page'); toggleMobileMenu();" class="mobile-menu-link">🚪 Logout</a>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <!-- Hero Section -->
+            <div class="text-center mb-16">
+                <h1 class="text-5xl font-bold mb-4">Welcome to Legora</h1>
+                <p class="text-xl text-gray-400 mb-8">Your comprehensive legal tech platform for case simulation, AI assistance, and professional growth</p>
+                <p class="text-sm text-purple-400 font-medium mb-6">🔬 Prototype Version - Early Access</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="navigateTo('case-page')" class="px-8 py-3 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">Start a Case</button>
+                    <button onclick="navigateTo('ai-page')" class="px-8 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition">Ask LegoraAI</button>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <div class="bg-gray-900 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">50+</div>
+                    <div class="text-gray-400">Case Simulations</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">15+</div>
+                    <div class="text-gray-400">Jurisdictions</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">AI</div>
+                    <div class="text-gray-400">Assistant Ready</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">24/7</div>
+                    <div class="text-gray-400">Learning Access</div>
+                </div>
+            </div>
+
+            <!-- Latest Legal Insights (Replaced from Clubs) -->
+            <div class="mb-16">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold">Latest Legal Insights</h2>
+                    <button onclick="navigateTo('news-page')" class="text-primary hover:text-purple-400 font-medium">View All →</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Article Card 1 -->
+                    <div class="card bg-gray-900 rounded-xl p-6 cursor-pointer" onclick="openArticle('article1')">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Corporate Law</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇪🇺 EU</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">New EU Corporate Sustainability Directive</h3>
+                        <p class="text-gray-400 text-sm mb-4">Analysis of CSRD requirements and their impact on multinational corporations operating in European markets.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 text-xs">Nov 15, 2025</span>
+                            <button class="text-primary text-sm hover:text-purple-400">Read Article →</button>
+                        </div>
+                    </div>
+
+                    <!-- Article Card 2 -->
+                    <div class="card bg-gray-900 rounded-xl p-6 cursor-pointer" onclick="openArticle('article2')">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Arbitration</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🌍 International</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">ICC Arbitration Rules Update 2025</h3>
+                        <p class="text-gray-400 text-sm mb-4">Key changes in international commercial arbitration procedures and their practical implications.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 text-xs">Nov 12, 2025</span>
+                            <button class="text-primary text-sm hover:text-purple-400">Read Article →</button>
+                        </div>
+                    </div>
+
+                    <!-- Article Card 3 -->
+                    <div class="card bg-gray-900 rounded-xl p-6 cursor-pointer" onclick="openArticle('article3')">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Tech Law</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇺🇸 USA</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">AI Regulation: State vs Federal Approaches</h3>
+                        <p class="text-gray-400 text-sm mb-4">Comparative analysis of emerging AI governance frameworks across US jurisdictions.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 text-xs">Nov 10, 2025</span>
+                            <button class="text-primary text-sm hover:text-purple-400">Read Article →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Cases -->
+            <div class="mb-16">
+                <h2 class="text-3xl font-bold mb-8">Featured Case Simulations</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card bg-gray-900 rounded-xl p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Contract Dispute</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇬🇧 UK</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Tech Startup Partnership Dispute</h3>
+                        <p class="text-gray-400 text-sm mb-4">Analyze partnership dissolution issues in a fintech startup under English law.</p>
+                        <button onclick="navigateTo('case-page')" class="w-full py-2 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">Start Case</button>
+                    </div>
+
+                    <div class="card bg-gray-900 rounded-xl p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Human Rights</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇪🇺 ECHR</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Digital Privacy Rights Case</h3>
+                        <p class="text-gray-400 text-sm mb-4">Examine data protection violations under the European Convention on Human Rights.</p>
+                        <button onclick="navigateTo('case-page')" class="w-full py-2 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">Start Case</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News & Articles Page (Replaced Clubs) -->
+    <div id="news-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="mb-10">
+                <h1 class="text-4xl font-bold mb-3">News & Articles</h1>
+                <p class="text-gray-400 text-lg">Stay updated with the latest legal developments, analysis, and insights from around the world</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-gray-900 rounded-xl p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Jurisdiction</label>
+                        <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>All Jurisdictions</option>
+                            <option>🇪🇺 European Union</option>
+                            <option>🇺🇸 United States</option>
+                            <option>🇬🇧 United Kingdom</option>
+                            <option>🌍 International</option>
+                            <option>🇫🇷 France</option>
+                            <option>🇩🇪 Germany</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Area of Law</label>
+                        <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>All Areas</option>
+                            <option>Corporate Law</option>
+                            <option>Arbitration</option>
+                            <option>Human Rights</option>
+                            <option>Tech Law</option>
+                            <option>Employment Law</option>
+                            <option>Criminal Law</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Source Type</label>
+                        <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>All Sources</option>
+                            <option>Official Documents</option>
+                            <option>Academic Papers</option>
+                            <option>Case Commentary</option>
+                            <option>Blog Articles</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Sort By</label>
+                        <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>Most Recent</option>
+                            <option>Most Popular</option>
+                            <option>Most Relevant</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Article 1 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Corporate Law</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇪🇺 EU</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">New EU Corporate Sustainability Directive</h3>
+                    <p class="text-gray-400 text-sm mb-4">Analysis of CSRD requirements and their impact on multinational corporations operating in European markets. The directive introduces comprehensive sustainability reporting...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Official</span>
+                        <span class="text-gray-500 text-xs">Nov 15, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article1')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article1')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+
+                <!-- Article 2 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Arbitration</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🌍 International</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">ICC Arbitration Rules Update 2025</h3>
+                    <p class="text-gray-400 text-sm mb-4">Key changes in international commercial arbitration procedures and their practical implications for cross-border disputes...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Academic</span>
+                        <span class="text-gray-500 text-xs">Nov 12, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article2')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article2')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+
+                <!-- Article 3 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Tech Law</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇺🇸 USA</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI Regulation: State vs Federal</h3>
+                    <p class="text-gray-400 text-sm mb-4">Comparative analysis of emerging AI governance frameworks across US jurisdictions and their implications for tech companies...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Blog</span>
+                        <span class="text-gray-500 text-xs">Nov 10, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article3')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article3')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+
+                <!-- Article 4 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Human Rights</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇪🇺 ECHR</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">ECHR Decision on Digital Privacy</h3>
+                    <p class="text-gray-400 text-sm mb-4">Landmark ruling on state surveillance and data retention under Article 8 of the European Convention on Human Rights...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Case Comment</span>
+                        <span class="text-gray-500 text-xs">Nov 8, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article4')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article4')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+
+                <!-- Article 5 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Employment Law</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇫🇷 France</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Remote Work Rights in France</h3>
+                    <p class="text-gray-400 text-sm mb-4">New amendments to the French Labor Code regarding telework arrangements and employer obligations in the post-pandemic era...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Official</span>
+                        <span class="text-gray-500 text-xs">Nov 5, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article5')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article5')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+
+                <!-- Article 6 -->
+                <div class="card bg-gray-900 rounded-xl p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Criminal Law</span>
+                        <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇬🇧 UK</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Cybercrime Legislation Reform</h3>
+                    <p class="text-gray-400 text-sm mb-4">UK Parliament considers expanded powers for law enforcement in investigating cryptocurrency-related crimes...</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">Blog</span>
+                        <span class="text-gray-500 text-xs">Nov 3, 2025</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openArticle('article6')" class="flex-1 py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">Read</button>
+                        <button onclick="askLegoraAIAboutArticle('article6')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">Ask AI 🤖</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-10">
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">Previous</button>
+                    <button class="px-4 py-2 bg-primary rounded-lg">1</button>
+                    <button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">2</button>
+                    <button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">3</button>
+                    <button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Simulation Page -->
+    <div id="case-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold mb-3">Case Simulation</h1>
+                <p class="text-gray-400 text-lg">Practice your legal skills with real-world scenarios</p>
+            </div>
+
+            <!-- Prototype Notice -->
+            <div class="mb-8 bg-purple-900/20 border-2 border-purple-500/50 rounded-xl p-5">
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl">🔬</div>
+                    <div class="flex-1">
+                        <h3 class="text-base font-semibold text-purple-300 mb-1">Prototype Preview</h3>
+                        <p class="text-gray-300 text-sm">
+                            The case simulations are functional, but <strong>AI feedback responses</strong> are pre-written examples to demonstrate the interface. Full AI integration is planned for the production version.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Selection -->
+            <div class="bg-gray-900 rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-semibold mb-6">Select Your Case</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Jurisdiction</label>
+                        <select id="case-jurisdiction" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="uk">🇬🇧 United Kingdom</option>
+                            <option value="us">🇺🇸 United States</option>
+                            <option value="eu">🇪🇺 European Union</option>
+                            <option value="france">🇫🇷 France</option>
+                            <option value="germany">🇩🇪 Germany</option>
+                            <option value="intl">🌍 International Law</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Area of Law</label>
+                        <select id="case-area" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option>Corporate Law</option>
+                            <option>Contract Law</option>
+                            <option>Human Rights</option>
+                            <option>Arbitration</option>
+                            <option>Employment Law</option>
+                            <option>Criminal Law</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Case Type</label>
+                    <select id="case-type" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>Partnership Dispute</option>
+                        <option>Contract Breach</option>
+                        <option>Employment Termination</option>
+                        <option>Intellectual Property</option>
+                        <option>Data Protection Violation</option>
+                    </select>
+                </div>
+
+                <button id="start-case-btn" class="w-full py-3 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">
+                    Start Case Simulation
+                </button>
+            </div>
+
+            <!-- Case Details (shown after starting) -->
+            <div id="case-details" class="bg-gray-900 rounded-xl p-8 hidden">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-2">Tech Startup Partnership Dispute</h2>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">Contract Dispute</span>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-300 text-xs rounded-full">🇬🇧 UK Law</span>
+                        </div>
+                    </div>
+                    <button onclick="openLegoraAIForCase()" class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition flex items-center gap-2">
+                        <span>🤖</span>
+                        <span>Ask LegoraAI</span>
+                    </button>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Case Background</h3>
+                    <div class="bg-gray-800 p-6 rounded-lg text-gray-300">
+                        <p class="mb-4">Sarah Chen and David Martinez co-founded TechFlow, a fintech startup, in January 2023. They entered into a partnership agreement with the following key terms:</p>
+                        <ul class="list-disc list-inside space-y-2 mb-4">
+                            <li>Equal 50-50 ownership split</li>
+                            <li>Sarah as CEO handling operations and client relations</li>
+                            <li>David as CTO responsible for product development</li>
+                            <li>Both partners required to work full-time for the company</li>
+                            <li>No partner can be removed without mutual consent</li>
+                        </ul>
+                        <p class="mb-4">By mid-2024, serious conflicts emerged. Sarah discovered that David had been consulting for a competitor, GrowthFinance, spending significant time on their projects. This violated the full-time commitment clause in their partnership agreement.</p>
+                        <p>Sarah demands David's removal from the partnership and seeks damages for breach of fiduciary duty. David argues his consulting was during personal time and doesn't constitute a breach.</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Your Task</h3>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <p class="text-gray-300 mb-4">You represent Sarah Chen. Draft the key legal arguments for her case, addressing:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                            <li>Breach of partnership agreement</li>
+                            <li>Breach of fiduciary duty</li>
+                            <li>Remedies available under UK law</li>
+                            <li>Potential defenses David might raise</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Your Legal Arguments</label>
+                    <textarea id="case-arguments" rows="10" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-300" placeholder="Enter your legal analysis and arguments here..."></textarea>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="submit-case-btn" class="flex-1 py-3 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">
+                        Submit for Review
+                    </button>
+                    <button onclick="getFeedback()" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition">
+                        Get AI Feedback
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LegoraAI Page (Enhanced AI Assistant) -->
+    <div id="ai-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-bold mb-3">LegoraAI</h1>
+                <p class="text-xl text-gray-400">Your Multi-Jurisdictional Legal Assistant</p>
+                <p class="text-gray-500 mt-2">Ask legal questions, analyze documents, and get structured answers with references to legal norms</p>
+            </div>
+
+            <!-- Prototype Notice -->
+            <div class="mb-8 bg-purple-900/20 border-2 border-purple-500/50 rounded-xl p-6">
+                <div class="flex items-start gap-4">
+                    <div class="text-3xl">🔬</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-purple-300 mb-2">Prototype Interface Preview</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            <strong>Please note:</strong> The AI is not yet integrated into this prototype. What you see here is a <strong>visual demonstration</strong> of how LegoraAI will look and function once fully developed. The responses shown are examples to illustrate the interface design and user experience.
+                        </p>
+                        <p class="text-gray-400 text-xs mt-3">
+                            💡 In the final version, LegoraAI will provide real-time legal analysis powered by advanced AI models trained on multi-jurisdictional legal data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode Selection Tabs -->
+            <div class="flex justify-center gap-4 mb-8 flex-wrap">
+                <button class="mode-tab active" data-mode="question" onclick="switchAIMode('question')">
+                    ❓ Ask Legal Question
+                </button>
+                <button class="mode-tab" data-mode="document" onclick="switchAIMode('document')">
+                    📄 Analyze Document/Clause
+                </button>
+                <button class="mode-tab" data-mode="compare" onclick="switchAIMode('compare')">
+                    ⚖️ Compare Jurisdictions
+                </button>
+            </div>
+
+            <!-- AI Assistant Interface -->
+            <div class="bg-gray-900 rounded-xl p-8">
+                <!-- Legal Parameters -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Legal Parameters</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Jurisdiction</label>
+                            <select id="ai-jurisdiction" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="intl">🌍 International Law</option>
+                                <option value="eu">🇪🇺 European Union</option>
+                                <option value="uk">🇬🇧 United Kingdom</option>
+                                <option value="us">🇺🇸 United States</option>
+                                <option value="france">🇫🇷 France</option>
+                                <option value="germany">🇩🇪 Germany</option>
+                                <option value="spain">🇪🇸 Spain</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Area of Law</label>
+                            <select id="ai-area" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option>Corporate Law</option>
+                                <option>Arbitration</option>
+                                <option>Human Rights</option>
+                                <option>Tech & Data Law</option>
+                                <option>Employment Law</option>
+                                <option>Criminal Law</option>
+                                <option>Contract Law</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Effective Date</label>
+                            <select id="ai-date" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="current">Current Law</option>
+                                <option value="custom">Specific Date...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mode-specific content -->
+                <div id="mode-question" class="mode-content">
+                    <label class="block text-sm font-medium mb-2">Your Legal Question</label>
+                    <textarea id="ai-input" rows="6" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-300 mb-4" placeholder="Ask your legal question here... For example: 'What are the requirements for establishing a subsidiary in France?' or 'How does GDPR apply to cross-border data transfers?'"></textarea>
+                </div>
+
+                <div id="mode-document" class="mode-content hidden">
+                    <label class="block text-sm font-medium mb-2">Document or Clause to Analyze</label>
+                    <textarea id="ai-document-input" rows="6" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-300 mb-4" placeholder="Paste your contract clause or legal document here for analysis..."></textarea>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Or Upload Document</label>
+                        <input type="file" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300">
+                    </div>
+                </div>
+
+                <div id="mode-compare" class="mode-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">First Jurisdiction</label>
+                            <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="france">🇫🇷 France</option>
+                                <option value="germany">🇩🇪 Germany</option>
+                                <option value="uk">🇬🇧 United Kingdom</option>
+                                <option value="us">🇺🇸 United States</option>
+                                <option value="spain">🇪🇸 Spain</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Second Jurisdiction</label>
+                            <select class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="spain">🇪🇸 Spain</option>
+                                <option value="france">🇫🇷 France</option>
+                                <option value="germany">🇩🇪 Germany</option>
+                                <option value="uk">🇬🇧 United Kingdom</option>
+                                <option value="us">🇺🇸 United States</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label class="block text-sm font-medium mb-2">What would you like to compare?</label>
+                    <textarea id="ai-compare-input" rows="6" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-300 mb-4" placeholder="For example: 'Compare employment contract requirements' or 'What are the differences in data protection laws?'"></textarea>
+                </div>
+
+                <button id="ask-ai-btn" class="w-full py-3 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">
+                    Ask LegoraAI
+                </button>
+
+                <!-- AI Response Area -->
+                <div id="ai-response" class="mt-8 hidden">
+                    <h3 class="text-xl font-semibold mb-4">LegoraAI Response</h3>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div id="ai-response-content" class="text-gray-300 whitespace-pre-wrap"></div>
+                        
+                        <!-- Legal References Section -->
+                        <div class="mt-6 pt-6 border-t border-gray-700">
+                            <h4 class="text-lg font-semibold mb-3">📚 Legal References</h4>
+                            <div id="ai-references" class="space-y-2 text-sm text-gray-400"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex gap-4">
+                        <button class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition">
+                            Save Response
+                        </button>
+                        <button class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition">
+                            Ask Follow-up Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Questions -->
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">Example Questions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-800 transition" onclick="fillExampleQuestion('question1')">
+                        <p class="text-sm text-gray-300">💼 "What are the key differences between SAS and SARL in French corporate law?"</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-800 transition" onclick="fillExampleQuestion('question2')">
+                        <p class="text-sm text-gray-300">⚖️ "How does arbitration under ICC rules differ from LCIA arbitration?"</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-800 transition" onclick="fillExampleQuestion('question3')">
+                        <p class="text-sm text-gray-300">🔒 "What are GDPR requirements for processing employee data?"</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-800 transition" onclick="fillExampleQuestion('question4')">
+                        <p class="text-sm text-gray-300">🌍 "Compare remote work regulations between France and Spain"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Page -->
+    <div id="leaderboard-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold mb-3">Leaderboard</h1>
+                <p class="text-gray-400 text-lg">Top performers in the Legora community</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-gray-900 rounded-xl p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <select class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>All Time</option>
+                        <option>This Month</option>
+                        <option>This Week</option>
+                    </select>
+                    <select class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>All Categories</option>
+                        <option>Cases Completed</option>
+                        <option>AI Interactions</option>
+                        <option>Articles Read</option>
+                    </select>
+                    <select class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>Global</option>
+                        <option>My Jurisdiction</option>
+                        <option>My University</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Top 3 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Rank 2 -->
+                <div class="bg-gray-900 rounded-xl p-6 text-center order-2 md:order-1">
+                    <div class="text-6xl mb-4">🥈</div>
+                    <div class="w-24 h-24 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+                        👩
+                    </div>
+                    <h3 class="text-xl font-semibold mb-1">Emma Wilson</h3>
+                    <p class="text-gray-400 text-sm mb-4">Oxford University</p>
+                    <div class="text-3xl font-bold text-primary mb-2">2,450 pts</div>
+                    <div class="flex justify-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">🏆 15 Badges</span>
+                    </div>
+                </div>
+
+                <!-- Rank 1 -->
+                <div class="bg-gradient-to-br from-purple-900 to-gray-900 rounded-xl p-6 text-center order-1 md:order-2 transform md:scale-105">
+                    <div class="text-6xl mb-4">👑</div>
+                    <div class="w-24 h-24 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-4 border-primary">
+                        👨
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-1">Alex Rodriguez</h3>
+                    <p class="text-gray-400 text-sm mb-4">Cambridge University</p>
+                    <div class="text-4xl font-bold text-primary mb-2">3,280 pts</div>
+                    <div class="flex justify-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">🏆 22 Badges</span>
+                    </div>
+                </div>
+
+                <!-- Rank 3 -->
+                <div class="bg-gray-900 rounded-xl p-6 text-center order-3">
+                    <div class="text-6xl mb-4">🥉</div>
+                    <div class="w-24 h-24 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+                        👨
+                    </div>
+                    <h3 class="text-xl font-semibold mb-1">James Chen</h3>
+                    <p class="text-gray-400 text-sm mb-4">LSE</p>
+                    <div class="text-3xl font-bold text-primary mb-2">2,180 pts</div>
+                    <div class="flex justify-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-800 text-xs rounded">🏆 12 Badges</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rankings Table -->
+            <div class="bg-gray-900 rounded-xl overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-medium">Rank</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium">User</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium">University</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium">Points</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium">Badges</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800">
+                        <tr class="hover:bg-gray-800 transition">
+                            <td class="px-6 py-4">4</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">👩</div>
+                                    <span>Sophie Martin</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">Sorbonne</td>
+                            <td class="px-6 py-4 text-primary font-semibold">1,950 pts</td>
+                            <td class="px-6 py-4">🏆 11</td>
+                        </tr>
+                        <tr class="hover:bg-gray-800 transition">
+                            <td class="px-6 py-4">5</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">👨</div>
+                                    <span>David Kumar</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">Harvard Law</td>
+                            <td class="px-6 py-4 text-primary font-semibold">1,820 pts</td>
+                            <td class="px-6 py-4">🏆 10</td>
+                        </tr>
+                        <tr class="hover:bg-gray-800 transition">
+                            <td class="px-6 py-4">6</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">👩</div>
+                                    <span>Maria Garcia</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">IE Law School</td>
+                            <td class="px-6 py-4 text-primary font-semibold">1,705 pts</td>
+                            <td class="px-6 py-4">🏆 9</td>
+                        </tr>
+                        <tr class="hover:bg-gray-800 transition">
+                            <td class="px-6 py-4">7</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">👨</div>
+                                    <span>Thomas Müller</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">LMU Munich</td>
+                            <td class="px-6 py-4 text-primary font-semibold">1,650 pts</td>
+                            <td class="px-6 py-4">🏆 8</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile-page" class="page fade-in">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Profile Info -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-900 rounded-xl p-8 text-center">
+                        <div class="w-32 h-32 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl">
+                            👤
+                        </div>
+                        <h2 class="text-2xl font-semibold mb-2">Your Name</h2>
+                        <p class="text-gray-400 mb-4"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4d3422383f6328202c24210d28352c203d2128632e2220">[email&#160;protected]</a></p>
+                        <div class="mb-4">
+                            <div class="text-3xl font-bold text-primary mb-1">1,420 pts</div>
+                            <div class="text-sm text-gray-400">Rank #12 Globally</div>
+                        </div>
+                        <button class="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition mb-3">
+                            Edit Profile
+                        </button>
+                        <button onclick="navigateTo('login-page')" class="w-full py-2 bg-red-900/30 hover:bg-red-900/50 text-red-400 rounded-lg font-medium transition">
+                            Logout
+                        </button>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="bg-gray-900 rounded-xl p-6 mt-6">
+                        <h3 class="text-lg font-semibold mb-4">Your Stats</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Cases Completed</span>
+                                <span class="font-semibold">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">AI Queries</span>
+                                <span class="font-semibold">45</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Articles Read</span>
+                                <span class="font-semibold">28</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Study Streak</span>
+                                <span class="font-semibold">7 days 🔥</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Achievements & Activity -->
+                <div class="lg:col-span-2">
+                    <!-- Badges -->
+                    <div class="bg-gray-900 rounded-xl p-8 mb-8">
+                        <h3 class="text-2xl font-semibold mb-6">Badges & Achievements</h3>
+                        <div class="grid grid-cols-3 md:grid-cols-5 gap-4">
+                            <div class="badge earned">🏆</div>
+                            <div class="badge earned">📚</div>
+                            <div class="badge earned">⚖️</div>
+                            <div class="badge earned">🤖</div>
+                            <div class="badge earned">🔥</div>
+                            <div class="badge locked">🎯</div>
+                            <div class="badge locked">💎</div>
+                            <div class="badge locked">🌟</div>
+                            <div class="badge locked">👑</div>
+                            <div class="badge locked">🚀</div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-4">8 of 20 badges earned. Keep going!</p>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-gray-900 rounded-xl p-8">
+                        <h3 class="text-2xl font-semibold mb-6">Recent Activity</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4 pb-4 border-b border-gray-800">
+                                <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+                                    ⚖️
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">Completed Partnership Dispute Case</p>
+                                    <p class="text-sm text-gray-400">Scored 85/100 • UK Corporate Law</p>
+                                    <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                </div>
+                                <span class="text-primary font-semibold">+150 pts</span>
+                            </div>
+                            
+                            <div class="flex items-start gap-4 pb-4 border-b border-gray-800">
+                                <div class="w-10 h-10 bg-green-900/20 rounded-full flex items-center justify-center text-green-400 flex-shrink-0">
+                                    🤖
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">Asked LegoraAI about GDPR</p>
+                                    <p class="text-sm text-gray-400">EU Data Protection Law</p>
+                                    <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+                                </div>
+                                <span class="text-primary font-semibold">+25 pts</span>
+                            </div>
+
+                            <div class="flex items-start gap-4 pb-4 border-b border-gray-800">
+                                <div class="w-10 h-10 bg-blue-900/20 rounded-full flex items-center justify-center text-blue-400 flex-shrink-0">
+                                    📰
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">Read article on ICC Arbitration</p>
+                                    <p class="text-sm text-gray-400">International Law • Arbitration</p>
+                                    <p class="text-xs text-gray-500 mt-1">Yesterday</p>
+                                </div>
+                                <span class="text-primary font-semibold">+10 pts</span>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-yellow-900/20 rounded-full flex items-center justify-center text-yellow-400 flex-shrink-0">
+                                    🏅
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">Earned "Week Warrior" Badge</p>
+                                    <p class="text-sm text-gray-400">7-day study streak completed</p>
+                                    <p class="text-xs text-gray-500 mt-1">2 days ago</p>
+                                </div>
+                                <span class="text-primary font-semibold">+100 pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Page -->
+    <div id="feedback-page" class="page fade-in">
+        <div class="max-w-4xl mx-auto px-6 py-10">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <div class="inline-block p-3 bg-purple-900/30 rounded-full mb-4">
+                    <svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">Legora — Shape the Future of Legal Tech</h1>
+                <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+            </div>
+
+            <!-- Main Content Card -->
+            <div class="bg-gray-900 rounded-2xl p-8 md:p-12 mb-8 shadow-xl">
+                <div class="space-y-6 text-lg text-gray-300 leading-relaxed">
+                    <p class="text-xl">
+                        You're testing an <span class="text-primary font-semibold">early prototype</span> of Legora, a global platform for legal learning and professional growth.
+                    </p>
+                    
+                    <p>
+                        Your feedback will <span class="text-purple-400 font-semibold">directly influence</span> its next steps and help us build something truly valuable for the global legal community.
+                    </p>
+                    
+                    <div class="bg-gray-800/50 rounded-xl p-6 my-6 border-l-4 border-primary">
+                        <p class="text-gray-200 italic">
+                            "Every great platform starts with early adopters who aren't afraid to share honest thoughts. Your insights matter more than you think."
+                        </p>
+                    </div>
+                    
+                    <p>
+                        Whether you've encountered a bug, have a feature suggestion, or simply want to share your experience — we want to hear from you. This is more than feedback; it's a conversation about the future of legal technology.
+                    </p>
+                    
+                    <p class="text-xl font-semibold text-white pt-4">
+                        Thank you for being part of the beginning. 🚀
+                    </p>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="mt-10 text-center">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSd6m4-w4TC7147KTjBieHitIs1_6kiFGu_uPCH__YhyI5RNRw/viewform?usp=sharing&ouid=107215210569492705298" 
+                       target="_blank" 
+                       class="inline-block px-10 py-4 bg-primary hover:bg-purple-700 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/50">
+                        Share Your Feedback →
+                    </a>
+                    <p class="text-gray-500 text-sm mt-4">Opens in a new tab • Takes about 3-5 minutes</p>
+                </div>
+            </div>
+
+            <!-- Additional Info Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-3xl mb-3">💡</div>
+                    <h3 class="font-semibold mb-2">Feature Ideas</h3>
+                    <p class="text-sm text-gray-400">Suggest new features and improvements</p>
+                </div>
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-3xl mb-3">🐛</div>
+                    <h3 class="font-semibold mb-2">Bug Reports</h3>
+                    <p class="text-sm text-gray-400">Help us identify and fix issues</p>
+                </div>
+                <div class="bg-gray-900 rounded-xl p-6 text-center">
+                    <div class="text-3xl mb-3">⭐</div>
+                    <h3 class="font-semibold mb-2">General Thoughts</h3>
+                    <p class="text-sm text-gray-400">Share your overall experience</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini AI Widget (shown on case page) -->
+    <div id="mini-ai-widget" class="mini-ai-widget">
+        <div class="flex items-center justify-between mb-3">
+            <h4 class="font-semibold flex items-center gap-2">
+                <span>🤖</span>
+                <span>LegoraAI</span>
+            </h4>
+            <button onclick="closeMiniAI()" class="text-gray-400 hover:text-white">✕</button>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Get instant help with this case</p>
+        <button onclick="openLegoraAIForCase()" class="w-full py-2 bg-primary hover:bg-purple-700 rounded-lg text-sm font-medium transition">
+            Ask About This Case
+        </button>
+    </div>
+
+    <!-- Feedback Popup -->
+    <div id="feedback-popup" class="feedback-popup">
+        <div class="bg-gray-900 rounded-xl p-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold">AI Feedback</h3>
+                <button onclick="closeFeedback()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="feedback-content" class="text-gray-300 space-y-4">
+                <!-- Content will be dynamically added -->
+            </div>
+            <button onclick="closeFeedback()" class="w-full mt-6 py-3 bg-primary hover:bg-purple-700 rounded-lg font-medium transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay" onclick="closeFeedback()"></div>
+
+    <!-- JavaScript -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Navigation
+        function navigateTo(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show/hide nav based on page
+            const nav = document.getElementById('main-nav');
+            if (pageId === 'login-page') {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            
+            // Add fade-in animation
+            document.getElementById(pageId).classList.add('fade-in');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // LegoraAI Mode Switching
+        function switchAIMode(mode) {
+            // Update tab styling
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Hide all mode content
+            document.querySelectorAll('.mode-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected mode content
+            document.getElementById(`mode-${mode}`).classList.remove('hidden');
+            
+            // Update placeholder based on mode
+            const input = document.getElementById('ai-input');
+            const docInput = document.getElementById('ai-document-input');
+            const compareInput = document.getElementById('ai-compare-input');
+            
+            if (mode === 'question') {
+                // Already has placeholder
+            } else if (mode === 'document') {
+                // Document mode active
+            } else if (mode === 'compare') {
+                // Compare mode active
+            }
+        }
+
+        // Fill example question
+        function fillExampleQuestion(questionId) {
+            const questions = {
+                'question1': 'What are the key differences between SAS (Société par Actions Simplifiée) and SARL (Société à Responsabilité Limitée) in French corporate law?',
+                'question2': 'How does arbitration under ICC rules differ from LCIA arbitration in terms of procedure and costs?',
+                'question3': 'What are the GDPR requirements for processing employee personal data, and what are the legal bases available?',
+                'question4': 'Compare the remote work regulations between France and Spain, particularly regarding employer obligations and employee rights.'
+            };
+            
+            document.getElementById('ai-input').value = questions[questionId];
+            switchAIMode('question');
+        }
+
+        // Ask LegoraAI from News article
+        function askLegoraAIAboutArticle(articleId) {
+            const articles = {
+                'article1': {
+                    title: 'EU Corporate Sustainability Directive',
+                    jurisdiction: 'eu',
+                    area: 'Corporate Law',
+                    question: 'Can you explain the key requirements of the EU Corporate Sustainability Reporting Directive (CSRD) and how it affects companies?'
+                },
+                'article2': {
+                    title: 'ICC Arbitration Rules Update 2025',
+                    jurisdiction: 'intl',
+                    area: 'Arbitration',
+                    question: 'What are the main changes in the ICC Arbitration Rules 2025 update and their practical implications?'
+                },
+                'article3': {
+                    title: 'AI Regulation: State vs Federal',
+                    jurisdiction: 'us',
+                    area: 'Tech & Data Law',
+                    question: 'What are the differences between state-level and federal approaches to AI regulation in the United States?'
+                }
+            };
+            
+            const article = articles[articleId];
+            if (article) {
+                // Navigate to LegoraAI page
+                navigateTo('ai-page');
+                
+                // Set parameters
+                document.getElementById('ai-jurisdiction').value = article.jurisdiction;
+                document.getElementById('ai-area').value = article.area;
+                document.getElementById('ai-input').value = article.question;
+                
+                // Ensure question mode is active
+                switchAIMode('question');
+                
+                // Scroll to input
+                setTimeout(() => {
+                    document.getElementById('ai-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        // Open article (placeholder)
+        function openArticle(articleId) {
+            alert('Article viewer would open here. This is a prototype feature.');
+        }
+
+        // Case Database
+        const casesDatabase = {
+            'Partnership Dispute': {
+                title: 'Tech Startup Partnership Dispute',
+                tags: ['Contract Dispute', '🇬🇧 UK Law'],
+                background: `
+                    <p class="mb-4">Sarah Chen and David Martinez co-founded TechFlow, a fintech startup, in January 2023. They entered into a partnership agreement with the following key terms:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Equal 50-50 ownership split</li>
+                        <li>Sarah as CEO handling operations and client relations</li>
+                        <li>David as CTO responsible for product development</li>
+                        <li>Both partners required to work full-time for the company</li>
+                        <li>No partner can be removed without mutual consent</li>
+                    </ul>
+                    <p class="mb-4">By mid-2024, serious conflicts emerged. Sarah discovered that David had been consulting for a competitor, GrowthFinance, spending significant time on their projects. This violated the full-time commitment clause in their partnership agreement.</p>
+                    <p>Sarah demands David's removal from the partnership and seeks damages for breach of fiduciary duty. David argues his consulting was during personal time and doesn't constitute a breach.</p>
+                `,
+                task: `
+                    <p class="text-gray-300 mb-4">You represent Sarah Chen. Draft the key legal arguments for her case, addressing:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Breach of partnership agreement</li>
+                        <li>Breach of fiduciary duty</li>
+                        <li>Remedies available under UK law</li>
+                        <li>Potential defenses David might raise</li>
+                    </ol>
+                `,
+                aiPrompt: 'I am working on a case about a partnership dispute between Sarah Chen and David Martinez in their fintech startup TechFlow. David was consulting for a competitor while supposed to work full-time for TechFlow. What are the key legal issues regarding breach of partnership agreement and fiduciary duty under UK law?'
+            },
+            'Contract Breach': {
+                title: 'Software Development Contract Breach',
+                tags: ['Contract Law', '🇺🇸 US Law'],
+                background: `
+                    <p class="mb-4">InnovateTech LLC contracted with DevSolutions Inc. in March 2024 for the development of a custom e-commerce platform. The contract stipulated:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Delivery deadline: September 1, 2024</li>
+                        <li>Total contract value: $250,000</li>
+                        <li>Payment schedule: 30% upfront, 40% at milestone completion, 30% upon final delivery</li>
+                        <li>Specific technical requirements including mobile responsiveness and payment gateway integration</li>
+                        <li>Liquidated damages clause: $5,000 per week for late delivery</li>
+                    </ul>
+                    <p class="mb-4">DevSolutions delivered the platform on October 15, 2024 (6 weeks late). Additionally, the mobile version was not functioning properly, and the payment gateway integration was incomplete.</p>
+                    <p>InnovateTech refused final payment and demands liquidated damages. DevSolutions claims the delays were caused by InnovateTech's late provision of required specifications and argues for substantial performance.</p>
+                `,
+                task: `
+                    <p class="text-gray-300 mb-4">You represent InnovateTech LLC. Prepare arguments addressing:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Material breach of contract by DevSolutions</li>
+                        <li>Applicability of liquidated damages clause</li>
+                        <li>Rejection of substantial performance defense</li>
+                        <li>Damages calculation and remedies under US contract law</li>
+                    </ol>
+                `,
+                aiPrompt: 'I am working on a contract breach case where DevSolutions Inc. delivered a software platform 6 weeks late with incomplete features to InnovateTech LLC. The contract included a liquidated damages clause. What are the key issues regarding material breach, liquidated damages, and the substantial performance defense under US contract law?'
+            },
+            'Employment Termination': {
+                title: 'Wrongful Termination Case',
+                tags: ['Employment Law', '🇫🇷 French Law'],
+                background: `
+                    <p class="mb-4">Marie Dubois worked as Marketing Director for GlobalRetail France from June 2020 to August 2024. She had a permanent contract (CDI) with the following terms:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Annual salary: €85,000</li>
+                        <li>Notice period: 3 months</li>
+                        <li>Performance bonuses based on KPIs</li>
+                        <li>No non-compete clause</li>
+                    </ul>
+                    <p class="mb-4">In August 2024, GlobalRetail terminated Marie's employment, citing "serious misconduct" (faute grave) after discovering she had allegedly shared confidential marketing strategies with a competitor during a professional networking event.</p>
+                    <p class="mb-4">Marie denies the allegations, stating she merely discussed general industry trends. She received no severance pay and was terminated immediately without notice. She had consistently positive performance reviews throughout her employment.</p>
+                    <p>Marie claims wrongful termination and seeks reinstatement or compensation, including severance pay, notice period compensation, and damages for moral harm.</p>
+                `,
+                task: `
+                    <p class="text-gray-300 mb-4">You represent Marie Dubois. Draft arguments covering:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Insufficient evidence of "faute grave" under French labor law</li>
+                        <li>Violation of procedural requirements for dismissal</li>
+                        <li>Calculation of compensation due (severance, notice, damages)</li>
+                        <li>Possible reinstatement or alternative remedies</li>
+                    </ol>
+                `,
+                aiPrompt: 'I am working on a wrongful termination case in France where Marie Dubois was fired for alleged "faute grave" without proper evidence or procedure. She received no severance or notice. What are the requirements for faute grave dismissal under French labor law and what compensation might she be entitled to?'
+            },
+            'Intellectual Property': {
+                title: 'Patent Infringement Dispute',
+                tags: ['IP Law', '🇩🇪 German Law'],
+                background: `
+                    <p class="mb-4">BioTech Innovations GmbH holds a German patent (granted in 2020) for a novel medical device used in minimally invasive surgery. The patent covers both the device design and the specific manufacturing process.</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Patent number: DE 10 2020 123 456</li>
+                        <li>Key claims: Unique catheter design with integrated imaging system</li>
+                        <li>Patent valid until 2040</li>
+                    </ul>
+                    <p class="mb-4">In January 2024, MedEquip Solutions launched a competing product called "VisionCath" that BioTech claims infringes their patent. While VisionCath has some design differences, BioTech argues the core inventive concept is identical.</p>
+                    <p class="mb-4">MedEquip denies infringement, claiming their device uses a substantially different technical approach. They also argue BioTech's patent should be invalidated due to prior art they recently discovered.</p>
+                    <p>BioTech seeks an injunction to stop MedEquip's sales in Germany and damages for lost profits estimated at €2.5 million.</p>
+                `,
+                task: `
+                    <p class="text-gray-300 mb-4">You represent BioTech Innovations. Prepare arguments on:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Patent infringement analysis under German law</li>
+                        <li>Doctrine of equivalents application</li>
+                        <li>Defense against invalidity claims based on prior art</li>
+                        <li>Injunction requirements and damages calculation</li>
+                    </ol>
+                `,
+                aiPrompt: 'I am working on a patent infringement case in Germany where BioTech Innovations claims MedEquip Solutions infringes their medical device patent. MedEquip argues non-infringement and patent invalidity. What are the key legal standards for patent infringement and available remedies under German patent law?'
+            },
+            'Data Protection Violation': {
+                title: 'GDPR Data Breach Case',
+                tags: ['Data Protection', '🇪🇺 EU Law'],
+                background: `
+                    <p class="mb-4">SocialConnect, a social media platform with 5 million EU users, suffered a data breach in July 2024. Personal data of 500,000 users was exposed, including:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Names and email addresses</li>
+                        <li>Profile photos and posts</li>
+                        <li>Private messages</li>
+                        <li>Location data from mobile app usage</li>
+                    </ul>
+                    <p class="mb-4">Investigation revealed several GDPR compliance failures:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>Inadequate encryption of personal data at rest</li>
+                        <li>No Data Protection Impact Assessment (DPIA) conducted despite high-risk processing</li>
+                        <li>72-hour breach notification to supervisory authority was delayed by 5 days</li>
+                        <li>Affected users were not individually notified</li>
+                        <li>No appointed Data Protection Officer (DPO)</li>
+                    </ul>
+                    <p>The Irish Data Protection Commission is investigating and considering administrative fines. Several affected users are also pursuing civil claims for damages.</p>
+                `,
+                task: `
+                    <p class="text-gray-300 mb-4">You represent the Data Protection Commission. Analyze:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>GDPR violations and their severity</li>
+                        <li>Calculation of potential administrative fines (Article 83 GDPR)</li>
+                        <li>Required remedial measures for SocialConnect</li>
+                        <li>Individual data subjects' rights to compensation</li>
+                    </ol>
+                `,
+                aiPrompt: 'I am working on a GDPR data breach case where SocialConnect exposed 500,000 users personal data and failed to follow proper notification procedures, conduct DPIA, and appoint a DPO. What are the potential fines and remedies under GDPR Articles 33, 34, 35, 37, and 83?'
+            }
+        };
+
+        // Case Simulation
+        document.getElementById('start-case-btn')?.addEventListener('click', function() {
+            const caseType = document.getElementById('case-type').value;
+            const selectedCase = casesDatabase[caseType];
+            
+            if (selectedCase) {
+                // Update case details
+                document.querySelector('#case-details h2').textContent = selectedCase.title;
+                
+                // Update tags
+                const tagsContainer = document.querySelector('#case-details .flex.gap-2');
+                tagsContainer.innerHTML = selectedCase.tags.map(tag => 
+                    `<span class="px-3 py-1 bg-purple-900/50 text-primary text-xs rounded-full">${tag}</span>`
+                ).join('');
+                
+                // Update background
+                document.querySelector('#case-details .bg-gray-800.p-6.rounded-lg.text-gray-300').innerHTML = selectedCase.background;
+                
+                // Update task
+                document.querySelector('#case-details .bg-gray-800.p-6.rounded-lg:not(.text-gray-300)').innerHTML = selectedCase.task;
+                
+                // Store AI prompt for later use
+                window.currentCaseAIPrompt = selectedCase.aiPrompt;
+            }
+            
+            document.getElementById('case-details').classList.remove('hidden');
+            this.parentElement.scrollIntoView({ behavior: 'smooth' });
+            
+            // Show mini AI widget after 2 seconds
+            setTimeout(() => {
+                document.getElementById('mini-ai-widget').classList.add('show');
+            }, 2000);
+        });
+
+        // Open LegoraAI for current case
+        function openLegoraAIForCase() {
+            const jurisdiction = document.getElementById('case-jurisdiction')?.value || 'uk';
+            const area = document.getElementById('case-area')?.value || 'Corporate Law';
+            const caseText = window.currentCaseAIPrompt || 'I am working on a case about a partnership dispute between Sarah Chen and David Martinez in their fintech startup TechFlow. David was consulting for a competitor while supposed to work full-time for TechFlow. What are the key legal issues regarding breach of partnership agreement and fiduciary duty under UK law?';
+            
+            // Navigate to AI page
+            navigateTo('ai-page');
+            
+            // Populate fields
+            setTimeout(() => {
+                const jurisdictionMap = {
+                    'uk': 'uk',
+                    'us': 'us',
+                    'eu': 'eu',
+                    'france': 'france',
+                    'germany': 'germany',
+                    'intl': 'intl'
+                };
+                
+                document.getElementById('ai-jurisdiction').value = jurisdictionMap[jurisdiction] || 'uk';
+                document.getElementById('ai-area').value = area;
+                document.getElementById('ai-input').value = caseText;
+                switchAIMode('question');
+            }, 100);
+            
+            // Close mini widget
+            closeMiniAI();
+        }
+
+        // Close mini AI widget
+        function closeMiniAI() {
+            document.getElementById('mini-ai-widget').classList.remove('show');
+        }
+
+        // AI Ask Button
+        document.getElementById('ask-ai-btn')?.addEventListener('click', function() {
+            const mode = document.querySelector('.mode-tab.active').dataset.mode;
+            let input = '';
+            
+            if (mode === 'question') {
+                input = document.getElementById('ai-input').value;
+            } else if (mode === 'document') {
+                input = document.getElementById('ai-document-input').value;
+            } else if (mode === 'compare') {
+                input = document.getElementById('ai-compare-input').value;
+            }
+            
+            if (!input.trim()) {
+                alert('Please enter your question or text to analyze.');
+                return;
+            }
+            
+            // Show loading state
+            this.textContent = 'Processing...';
+            this.disabled = true;
+            
+            // Simulate AI response (in real app, this would call an API)
+            setTimeout(() => {
+                const responseDiv = document.getElementById('ai-response');
+                const contentDiv = document.getElementById('ai-response-content');
+                const referencesDiv = document.getElementById('ai-references');
+                
+                // Sample response based on mode
+                let response = '';
+                let references = [];
+                
+                if (mode === 'question') {
+                    response = `Based on your question about ${input.substring(0, 50)}...\n\nHere's a structured answer considering the selected jurisdiction and area of law:\n\n1. Legal Framework:\nThe relevant legal provisions include...\n\n2. Key Requirements:\n- First requirement with explanation\n- Second requirement with details\n- Third requirement and implications\n\n3. Practical Application:\nIn practice, this means that...\n\n4. Exceptions and Nuances:\nNote that there are certain exceptions...`;
+                    
+                    references = [
+                        '📋 Partnership Act 1890 (UK), Section 24-25',
+                        '📋 Fiduciary Duties under Common Law',
+                        '⚖️ Case Law: Bentley v Craven (1853)',
+                        '⚖️ Case Law: Conlon v Simms (2006) EWCA'
+                    ];
+                } else if (mode === 'document') {
+                    response = `Document Analysis:\n\nI've reviewed the provided text. Here are the key legal issues and recommendations:\n\n1. Identified Clauses:\n- Clause type and purpose\n- Legal implications\n\n2. Potential Issues:\n- Risk areas identified\n- Compliance concerns\n\n3. Recommendations:\n- Suggested modifications\n- Best practices to follow`;
+                    
+                    references = [
+                        '📋 Contract Law principles',
+                        '📋 Relevant statutory provisions',
+                        '⚖️ Applicable case law'
+                    ];
+                } else if (mode === 'compare') {
+                    response = `Comparative Analysis:\n\nHere's a comparison between the selected jurisdictions:\n\n1. Jurisdiction A:\n- Key features\n- Requirements\n- Advantages\n\n2. Jurisdiction B:\n- Key features\n- Requirements\n- Advantages\n\n3. Key Differences:\n- Major distinctions\n- Practical implications\n\n4. Recommendations:\n- Which might be more suitable\n- Factors to consider`;
+                    
+                    references = [
+                        '📋 Comparative law sources',
+                        '🌍 International conventions',
+                        '⚖️ Relevant case law from both jurisdictions'
+                    ];
+                }
+                
+                contentDiv.textContent = response;
+                
+                referencesDiv.innerHTML = '';
+                references.forEach(ref => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-start gap-2';
+                    div.innerHTML = `<span class="flex-shrink-0">${ref.split(' ')[0]}</span><span>${ref.substring(ref.indexOf(' ') + 1)}</span>`;
+                    referencesDiv.appendChild(div);
+                });
+                
+                responseDiv.classList.remove('hidden');
+                responseDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                this.textContent = 'Ask LegoraAI';
+                this.disabled = false;
+            }, 1500);
+        });
+
+        // Get AI Feedback for case
+        function getFeedback() {
+            const args = document.getElementById('case-arguments').value;
+            if (!args.trim()) {
+                alert('Please enter your arguments first.');
+                return;
+            }
+            
+            const popup = document.getElementById('feedback-popup');
+            const overlay = document.getElementById('overlay');
+            const content = document.getElementById('feedback-content');
+            
+            content.innerHTML = `
+                <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                    <h4 class="font-semibold text-green-400 mb-2">✅ Strengths</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Good identification of breach of partnership agreement</li>
+                        <li>Clear structure of legal arguments</li>
+                        <li>Relevant case law references</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                    <h4 class="font-semibold text-yellow-400 mb-2">💡 Areas for Improvement</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Consider adding more detail on fiduciary duty standards</li>
+                        <li>Address potential defenses more comprehensively</li>
+                        <li>Include remedies available under Partnership Act 1890</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-800 p-4 rounded-lg">
+                    <h4 class="font-semibold text-primary mb-2">📚 Suggested Resources</h4>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Partnership Act 1890, Sections 24-30</li>
+                        <li>Conlon v Simms [2006] EWCA Civ 1749</li>
+                        <li>Popat v Shonchhatra [1997] 1 WLR 1367</li>
+                    </ul>
+                </div>
+            `;
+            
+            popup.classList.add('show');
+            overlay.classList.add('show');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback-popup').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // Submit case
+        document.getElementById('submit-case-btn')?.addEventListener('click', function() {
+            const args = document.getElementById('case-arguments').value;
+            if (!args.trim()) {
+                alert('Please enter your arguments before submitting.');
+                return;
+            }
+            
+            this.textContent = 'Submitting...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                alert('Case submitted successfully! You earned 150 points. 🎉');
+                this.textContent = 'Submitted ✓';
+                this.classList.remove('bg-primary', 'hover:bg-purple-700');
+                this.classList.add('bg-green-600');
+            }, 1500);
+        });
+    </script>
+
+    <!-- Firebase Authentication -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5oIIVSh2rdzrTVv6bvsZkg2QqB7JnXi4",
+            authDomain: "legora-17.firebaseapp.com",
+            projectId: "legora-17",
+            storageBucket: "legora-17.firebasestorage.app",
+            messagingSenderId: "850733983985",
+            appId: "1:850733983985:web:a902fa2e4f964b5e05a150",
+        };
+
+        // Initialize Firebase
+        console.log("Initializing Firebase...");
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        console.log("Firebase initialized successfully");
+
+        // Check authentication state on page load
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                const currentPage = document.querySelector('.page.active');
+                if (currentPage && currentPage.id === 'login-page') {
+                    navigateTo('home-page');
+                }
+            } else {
+                console.log("No user logged in");
+                const currentPage = document.querySelector('.page.active');
+                if (currentPage && currentPage.id !== 'login-page') {
+                    navigateTo('login-page');
+                }
+            }
+        });
+
+        // Get buttons
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+
+        // Login functionality
+        if (loginBtn) {
+            console.log("Login button found, adding event listener");
+            loginBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log("Login button clicked");
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                console.log("Email:", email);
+                console.log("Password length:", password.length);
+
+                if (!email || !password) {
+                    alert("Please enter both email and password");
+                    return;
+                }
+
+                try {
+                    console.log("Attempting to sign in...");
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    console.log("Login successful:", userCredential.user.email);
+                    alert("Login successful! Welcome back.");
+                    navigateTo('home-page');
+                } catch (error) {
+                    console.error("Login error:", error);
+                    console.error("Error code:", error.code);
+                    console.error("Error message:", error.message);
+                    let errorMessage = "Login failed. ";
+                    
+                    switch(error.code) {
+                        case 'auth/invalid-email':
+                            errorMessage += "Invalid email address.";
+                            break;
+                        case 'auth/user-disabled':
+                            errorMessage += "This account has been disabled.";
+                            break;
+                        case 'auth/user-not-found':
+                            errorMessage += "No account found with this email.";
+                            break;
+                        case 'auth/wrong-password':
+                            errorMessage += "Incorrect password.";
+                            break;
+                        case 'auth/invalid-credential':
+                            errorMessage += "Invalid credentials. Please check your email and password.";
+                            break;
+                        default:
+                            errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
+                }
+            });
+        } else {
+            console.error("Login button not found!");
+        }
+
+        // Register functionality
+        if (registerBtn) {
+            console.log("Register button found, adding event listener");
+            registerBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log("Register button clicked");
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                console.log("Registration attempt - Email:", email);
+                console.log("Registration attempt - Password length:", password.length);
+
+                if (!email || !password) {
+                    alert("Please enter both email and password");
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert("Password must be at least 6 characters long");
+                    return;
+                }
+
+                try {
+                    console.log("Attempting to create user...");
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    console.log("Registration successful:", userCredential.user.email);
+                    alert("Account created successfully! Welcome to Legora.");
+                    navigateTo('home-page');
+                } catch (error) {
+                    console.error("Registration error:", error);
+                    console.error("Error code:", error.code);
+                    console.error("Error message:", error.message);
+                    let errorMessage = "Registration failed. ";
+                    
+                    switch(error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage += "This email is already registered. Try logging in instead.";
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage += "Invalid email address.";
+                            break;
+                        case 'auth/operation-not-allowed':
+                            errorMessage += "Email/password accounts are not enabled. Please contact support.";
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage += "Password is too weak. Please use at least 6 characters.";
+                            break;
+                        default:
+                            errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
+                }
+            });
+        } else {
+            console.error("Register button not found!");
+        }
+
+        // Logout functionality
+        const logoutButtons = document.querySelectorAll('[onclick*="login-page"]');
+        logoutButtons.forEach(button => {
+            button.addEventListener('click', async function(e) {
+                if (this.textContent.toLowerCase().includes('logout')) {
+                    e.preventDefault();
+                    try {
+                        await signOut(auth);
+                        console.log("Logout successful");
+                        alert("You have been logged out successfully.");
+                        navigateTo('login-page');
+                    } catch (error) {
+                        console.error("Logout error:", error);
+                        alert("Error logging out: " + error.message);
+                    }
+                }
+            });
+        });
+
+        // Allow Enter key to trigger login
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('login-btn').click();
+                }
+            });
+        }
+    </script>
